@@ -96,6 +96,8 @@ int net_http_status(struct http_t *state);
  **/
 bool net_http_error(struct http_t *state);
 
+char *net_http_effective_url(struct http_t *state);
+
 /**
  * net_http_headers:
  *

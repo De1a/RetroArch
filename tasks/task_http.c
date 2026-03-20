@@ -186,6 +186,7 @@ task_finished:
          bool mute;
          data          = (http_transfer_data_t*)malloc(sizeof(*data));
          data->data    = tmp;
+         data->effective_url = net_http_effective_url(http->handle);
          data->len     = _len;
          data->headers = net_http_headers_ex(http->handle, http->headers_accept_err);
          data->status  = net_http_status(http->handle);
@@ -213,6 +214,8 @@ static void task_http_transfer_cleanup(retro_task_t *task)
    if (data)
    {
       string_list_free(data->headers);
+      if (data->effective_url)
+         free(data->effective_url);
       if (data->data)
          free(data->data);
       free(data);

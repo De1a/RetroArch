@@ -56,6 +56,7 @@ typedef struct nbio_buf
 typedef struct
 {
    char *data;
+   char *effective_url;
    struct string_list *headers;
    size_t len;
    int status;

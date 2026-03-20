@@ -498,6 +498,12 @@ static void webdav_stat_cb(retro_task_t *task, void *task_data, void *user_data,
 
    if (!success && data)
        webdav_log_http_failure(webdav_st->url, data);
+   else if (success && data && !string_is_empty(data->effective_url))
+   {
+      strlcpy(webdav_st->url, data->effective_url, sizeof(webdav_st->url));
+      fill_pathname_slash(webdav_st->url, sizeof(webdav_st->url));
+      RARCH_DBG("[webdav] Updated base URL to %s\n", webdav_st->url);
+   }
 
    webdav_cb_st->cb(webdav_cb_st->user_data, NULL, success, NULL);
    free(webdav_cb_st);
