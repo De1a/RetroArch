@@ -101,6 +101,8 @@ static void task_http_transfer_cleanup(retro_task_t *task)
    if (data)
    {
       string_list_free(data->headers);
+      if (data->effective_url)
+         free(data->effective_url);
       if (data->data)
          free(data->data);
       free(data);
@@ -118,6 +120,7 @@ void wget_onload_cb(unsigned handle, void *t_ptr, void *data, unsigned len)
       return;
    }
    resp->data     = data;
+   resp->effective_url = NULL;
    resp->len      = len;
    resp->status   = 200;
    resp->headers  = NULL; /* sorry webdav */

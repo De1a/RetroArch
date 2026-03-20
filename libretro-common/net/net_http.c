@@ -1357,6 +1357,60 @@ static bool net_http_redirect(struct http_t *state, const char *location)
    /* url may be absolute or relative to the current url */
    bool absolute = (strstr(location, "://") != NULL);
 
+   /* If we redirect to a different origin, never forward Authorization to the
+    * new host. This avoids credential leakage and also prevents failures with
+    * services that redirect to pre-signed URLs (e.g. object storage). */
+   if (absolute && state && state->request.headers && state->request.domain)
+   {
+      struct http_connection_t *peek = net_http_connection_new(location, NULL, NULL);
+
+      if (peek)
+      {
+         net_http_connection_iterate(peek);
+
+         if (net_http_connection_done(peek))
+         {
+            bool origin_changed = (state->ssl != peek->ssl)
+               || (state->request.port != peek->port)
+               || !string_is_equal_case_insensitive(state->request.domain, peek->domain);
+
+            if (origin_changed)
+            {
+               const char *in = state->request.headers;
+               size_t in_len  = strlen(in);
+               char *out      = (char*)malloc(in_len + 1);
+               size_t out_len = 0;
+
+               if (out)
+               {
+                  const char *line = in;
+                  while (*line)
+                  {
+                     const char *eol = strchr(line, '\n');
+                     size_t line_len = eol ? (size_t)(eol - line + 1) : strlen(line);
+
+                     if (!string_starts_with_case_insensitive(line, "Authorization:"))
+                     {
+                        memcpy(out + out_len, line, line_len);
+                        out_len += line_len;
+                     }
+
+                     if (!eol)
+                        break;
+                     line = eol + 1;
+                  }
+
+                  out[out_len] = '\0';
+                  free(state->request.headers);
+                  state->request.headers = out;
+               }
+            }
+         }
+
+         net_http_connection_free(peek);
+      }
+   }
+
    if (absolute)
    {
       /* this block is a little wasteful, memory-wise */
@@ -1580,6 +1634,42 @@ uint8_t* net_http_data(struct http_t *state, size_t* len, bool accept_err)
       *len    = state->response.len;
 
    return (uint8_t*)state->response.data;
+}
+
+char *net_http_effective_url(struct http_t *state)
+{
+   const char *scheme;
+   const char *path;
+   const char *sep;
+   size_t len;
+   char *url;
+
+   if (!state || !state->request.domain || !state->request.path)
+      return NULL;
+
+   scheme = state->ssl ? "https://" : "http://";
+   path   = state->request.path;
+   /* request.path may or may not include a leading '/', depending on how it was built
+    * (initial parse vs. redirect). Always return a valid URL. */
+   sep    = (path[0] == '/') ? "" : "/";
+   len    = strlen(scheme) + strlen(state->request.domain)
+      + strlen(sep) + strlen(path) + 16;
+   url    = (char*)malloc(len);
+
+   if (!url)
+      return NULL;
+
+   if (state->request.port
+         && state->request.port != 80
+         && state->request.port != 443)
+      snprintf(url, len, "%s%s:%d%s%s",
+            scheme, state->request.domain, state->request.port,
+            sep, path);
+   else
+      snprintf(url, len, "%s%s%s%s",
+            scheme, state->request.domain, sep, path);
+
+   return url;
 }
 
 /**
