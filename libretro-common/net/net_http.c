@@ -1356,11 +1356,12 @@ static bool net_http_redirect(struct http_t *state, const char *location)
 
    /* url may be absolute or relative to the current url */
    bool absolute = (strstr(location, "://") != NULL);
+   settings_t *settings  = config_get_ptr();
 
    /* If we redirect to a different origin, never forward Authorization to the
     * new host. This avoids credential leakage and also prevents failures with
     * services that redirect to pre-signed URLs (e.g. object storage). */
-   if (absolute && state && state->request.headers && state->request.domain)
+   if (absolute && state && !settings->bool.cloud_sync_forward_authz && state->request.headers && state->request.domain)
    {
       struct http_connection_t *peek = net_http_connection_new(location, NULL, NULL);
 

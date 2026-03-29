@@ -3551,6 +3551,10 @@ MSG_HASH(
    "cloud_sync_password"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_CLOUD_SYNC_FORWARD_AUTHZ,
+   "cloud_sync_forward_authz"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_SCAN_DIRECTORY,
    "scan_directory"
    )
