@@ -27,7 +27,6 @@
 #include <net/net_http.h>
 #include <net/net_compat.h>
 #include <net/net_socket.h>
-#include <../../../configuration.h>
 #ifdef HAVE_SSL
 #include <net/net_socket_ssl.h>
 #endif
@@ -72,6 +71,8 @@ struct conn_pool_entry
 };
 
 static struct conn_pool_entry *conn_pool = NULL;
+static net_http_forward_auth_on_redirect_cb_t
+   net_http_forward_auth_on_redirect_cb = NULL;
 #ifdef HAVE_THREADS
 static slock_t *conn_pool_lock = NULL;
 #define LOCK_POOL() slock_lock(conn_pool_lock)
@@ -563,6 +564,12 @@ void net_http_connection_set_content(
       conn->postdata = malloc(content_length);
       memcpy(conn->postdata, content, content_length);
    }
+}
+
+void net_http_set_forward_auth_on_redirect_cb(
+      net_http_forward_auth_on_redirect_cb_t cb)
+{
+   net_http_forward_auth_on_redirect_cb = cb;
 }
 
 const char *net_http_connection_url(struct http_connection_t *conn)
@@ -1356,13 +1363,18 @@ static bool net_http_redirect(struct http_t *state, const char *location)
    /* this reinitializes state based on the new location */
 
    /* url may be absolute or relative to the current url */
-   bool absolute = (strstr(location, "://") != NULL);
-   settings_t *settings  = config_get_ptr();
+   bool absolute                 = (strstr(location, "://") != NULL);
+   bool forward_auth_on_redirect = false;
+
+   if (net_http_forward_auth_on_redirect_cb)
+      forward_auth_on_redirect =
+         net_http_forward_auth_on_redirect_cb();
 
    /* If we redirect to a different origin, never forward Authorization to the
     * new host. This avoids credential leakage and also prevents failures with
     * services that redirect to pre-signed URLs (e.g. object storage). */
-   if (absolute && state && !settings->bools.cloud_sync_forward_authz && state->request.headers && state->request.domain)
+   if (absolute && state && !forward_auth_on_redirect
+         && state->request.headers && state->request.domain)
    {
       struct http_connection_t *peek = net_http_connection_new(location, NULL, NULL);
 
