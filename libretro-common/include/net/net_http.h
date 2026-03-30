@@ -33,6 +33,7 @@ RETRO_BEGIN_DECLS
 
 struct http_t;
 struct http_connection_t;
+typedef bool (*net_http_forward_authz_on_redirect_cb_t)(void);
 
 struct http_connection_t *net_http_connection_new(const char *url, const char *method, const char *data);
 
@@ -53,6 +54,9 @@ void net_http_connection_set_headers(struct http_connection_t *conn, const char 
 
 void net_http_connection_set_content(struct http_connection_t *conn, const char *content_type,
       size_t content_length, const void *content);
+
+void net_http_set_forward_authz_on_redirect_cb(
+      net_http_forward_authz_on_redirect_cb_t cb);
 
 const char *net_http_connection_url(struct http_connection_t *conn);
 

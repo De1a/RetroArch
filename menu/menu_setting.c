@@ -12222,6 +12222,21 @@ static bool setting_append_list(
                general_read_handler,
                SD_FLAG_NONE);
 
+         CONFIG_BOOL(
+               list, list_info,
+               &settings->bools.cloud_sync_forward_authz,
+               MENU_ENUM_LABEL_CLOUD_SYNC_FORWARD_AUTHZ,
+               MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_FORWARD_AUTHZ,
+               false,
+               MENU_ENUM_LABEL_VALUE_OFF,
+               MENU_ENUM_LABEL_VALUE_ON,
+               &group_info,
+               &subgroup_info,
+               parent_group,
+               general_write_handler,
+               general_read_handler,
+               SD_FLAG_NONE);
+
          CONFIG_UINT(
                list, list_info,
                &settings->uints.cloud_sync_sync_mode,

@@ -1131,6 +1131,14 @@ MSG_HASH(
    "您的云存储账户的密码。"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_FORWARD_AUTHZ,
+   "转发认证"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_CLOUD_SYNC_FORWARD_AUTHZ,
+   "启用后，在重定向时转发认证信息。在某些重定向下载场景中禁用此选项，例如配置了302转发的OpenList。"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_LOGGING_SETTINGS,
    "日志"
    )

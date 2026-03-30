@@ -138,6 +138,7 @@
 
 #ifdef HAVE_NETWORKING
 #include <net/net_compat.h>
+#include <net/net_http.h>
 #include <net/net_socket.h>
 #endif
 
@@ -1535,6 +1536,13 @@ void driver_set_nonblock_state(void)
       ? audio_st->chunk_nonblock_size
       : audio_st->chunk_block_size;
 }
+
+#ifdef HAVE_NETWORKING
+static bool retroarch_http_forward_authz_on_redirect(void)
+{
+   return config_get_ptr()->bools.cloud_sync_forward_authz;
+}
+#endif
 
 void drivers_init(
       settings_t *settings,
@@ -7418,6 +7426,10 @@ static bool retroarch_parse_input_and_config(
       config_load_file_salamander();
 #endif
       config_load(global_get_ptr());
+#ifdef HAVE_NETWORKING
+      net_http_set_forward_authz_on_redirect_cb(
+            retroarch_http_forward_authz_on_redirect);
+#endif
 
       /* Remember the startup config path so "Save Main
        * Configuration" can find it after config_replace()

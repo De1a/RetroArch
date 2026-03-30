@@ -1042,6 +1042,7 @@ typedef struct settings
       bool cloud_sync_sync_configs;
       bool cloud_sync_sync_thumbs;
       bool cloud_sync_sync_system;
+      bool cloud_sync_forward_authz;
 
       /* Misc. */
       bool discord_enable;

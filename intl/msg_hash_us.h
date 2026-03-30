@@ -1151,6 +1151,14 @@ MSG_HASH(
    "Your username for your cloud storage account."
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_FORWARD_AUTHZ,
+   "Forward Authorization"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_CLOUD_SYNC_FORWARD_AUTHZ,
+   "When enabled, forward Authorization on redirect.Disable this for some redirected download scenarios, like OpenList is configured with 302 redirect."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_PASSWORD,
    "Password"
    )

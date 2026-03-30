@@ -11090,6 +11090,7 @@ unsigned menu_displaylist_build_list(
                {MENU_ENUM_LABEL_CLOUD_SYNC_URL,                PARSE_ONLY_STRING,         false},
                {MENU_ENUM_LABEL_CLOUD_SYNC_USERNAME,           PARSE_ONLY_STRING,         false},
                {MENU_ENUM_LABEL_CLOUD_SYNC_PASSWORD,           PARSE_ONLY_STRING,         false},
+               {MENU_ENUM_LABEL_CLOUD_SYNC_FORWARD_AUTHZ,      PARSE_ONLY_BOOL,           false},
 #ifdef HAVE_S3
                {MENU_ENUM_LABEL_CLOUD_SYNC_S3_URL,             PARSE_ONLY_STRING,         false},
                {MENU_ENUM_LABEL_CLOUD_SYNC_ACCESS_KEY_ID,      PARSE_ONLY_STRING,         false},
@@ -11115,6 +11116,7 @@ unsigned menu_displaylist_build_list(
                   case MENU_ENUM_LABEL_CLOUD_SYNC_USERNAME:
                   case MENU_ENUM_LABEL_CLOUD_SYNC_URL:
                   case MENU_ENUM_LABEL_CLOUD_SYNC_PASSWORD:
+                  case MENU_ENUM_LABEL_CLOUD_SYNC_FORWARD_AUTHZ:
                      if (string_is_equal(settings->arrays.cloud_sync_driver, "webdav"))
                         build_list[i].checked = true;
                      break;
